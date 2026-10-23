@@ -12,6 +12,8 @@ Added in 2.2
 - Explicit focus/capture scope through the target GUI thread/input queue.
 - Full source/tests, verification script, reproducible package builder and CI matrix.
 - Synthetic Windows-native tests for APIs, accessibility, GUI startup and hooks.
+- Explicit unsigned alpha-byte handling across Python versions; UIA disabled and
+  unsupported HRESULTs remain distinct.
 
 Version 2.1 fixes retained
 -------------------------
@@ -47,6 +49,6 @@ frozen reports, pause/normal mouse mode, and topmost reassertion are retained.
 
 Validation
 ----------
-The suite includes 63 logic/package tests and four native Windows tests. Consult
+The suite includes 64 logic/package tests and four native Windows tests. Consult
 GitHub Actions for platform-specific results. Tests use synthetic fixture data;
 no user's exported report or process environment is distributed with this package.

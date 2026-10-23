@@ -279,7 +279,7 @@ class NativeDetails:
         suffix = "PtrW" if C.sizeof(C.c_void_p) == 8 else "W"
         self.class_long = bind(self.user, "GetClassLong" + suffix, C.c_size_t, W.HWND, C.c_int)
         self.layer_attributes = bind(self.user, "GetLayeredWindowAttributes", W.BOOL,
-                                     W.HWND, C.POINTER(W.DWORD), C.POINTER(W.BYTE), C.POINTER(W.DWORD))
+                                     W.HWND, C.POINTER(W.DWORD), C.POINTER(C.c_ubyte), C.POINTER(W.DWORD))
         self.open_process = bind(self.kernel, "OpenProcess", W.HANDLE, W.DWORD, W.BOOL, W.DWORD)
         self.close_handle = bind(self.kernel, "CloseHandle", W.BOOL, W.HANDLE)
         self.priority = bind(self.kernel, "GetPriorityClass", W.DWORD, W.HANDLE)
@@ -290,7 +290,7 @@ class NativeDetails:
                                W.HANDLE, W.DWORD, C.POINTER(W.HANDLE))
         self.token_info = bind(self.advapi, "GetTokenInformation", W.BOOL,
                                W.HANDLE, C.c_int, C.c_void_p, W.DWORD, C.POINTER(W.DWORD))
-        self.sid_count = bind(self.advapi, "GetSidSubAuthorityCount", C.POINTER(W.BYTE), C.c_void_p)
+        self.sid_count = bind(self.advapi, "GetSidSubAuthorityCount", C.POINTER(C.c_ubyte), C.c_void_p)
         self.sid_part = bind(self.advapi, "GetSidSubAuthority", C.POINTER(W.DWORD), C.c_void_p, W.DWORD)
         self.package = bind(self.kernel, "GetPackageFullName", W.LONG,
                             W.HANDLE, C.POINTER(W.UINT), W.LPWSTR)
@@ -393,7 +393,7 @@ class NativeDetails:
             return unavailable(
                 "The window does not have WS_EX_LAYERED, so GetLayeredWindowAttributes does not apply. This does not determine compositor transparency.",
                 status="not_applicable", extended_style=extended)
-        color, alpha, flags = W.DWORD(), W.BYTE(), W.DWORD()
+        color, alpha, flags = W.DWORD(), C.c_ubyte(), W.DWORD()
         C.set_last_error(0)
         if self.layer_attributes(hwnd, C.byref(color), C.byref(alpha), C.byref(flags)):
             return {"color_key": color.value, "alpha": alpha.value, "flags": flags.value,

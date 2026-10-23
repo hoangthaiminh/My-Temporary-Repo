@@ -138,6 +138,15 @@ class ProcessExtensionTests(unittest.TestCase):
 
 
 class UIAPropertyTests(unittest.TestCase):
+    def test_disabled_and_unsupported_com_errors_are_distinct(self):
+        class ProviderError(Exception):
+            pass
+        error = ProviderError("Provider state")
+        error.hresult = 0x80040200
+        self.assertEqual(uia.failure(error)["status"], "query_unavailable")
+        error.hresult = 0x80040204
+        self.assertEqual(uia.failure(error)["status"], "not_supported")
+
     def element(self, values):
         element = Mock()
         element.GetCurrentPropertyValueEx.side_effect = lambda identifier, ignore: values.get(identifier, False)

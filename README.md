@@ -66,7 +66,7 @@ The tooltip remains compact; copied/frozen JSON contains the collected details.
 
 The repository includes source, tests, a package builder and GitHub Actions checks
 for Python 3.10/3.13 on Ubuntu, Windows Server 2022 and Windows Server 2025.
-The suite contains 63 logic/package tests plus four Windows-native integration
+The suite contains 64 logic/package tests plus four Windows-native integration
 tests using synthetic controls (not user reports). See
 [verification runs](https://github.com/hoangthaiminh/My-Temporary-Repo/actions/workflows/verify-inspector.yml)
 for actual run status. Native tests cover Win32 metadata, UI Automation values,

@@ -42,6 +42,19 @@ def main():
     user.SetFocus.restype = W.HWND
     user.SetCapture.argtypes = [W.HWND]
     user.SetCapture.restype = W.HWND
+    user.GetCapture.argtypes = []
+    user.GetCapture.restype = W.HWND
+    original = None
+    @api.proc_type
+    def procedure(window, message, wparam, lparam):
+        if message == 0x800A:
+            user.SetFocus(edit)
+            user.SetCapture(hwnd)
+            return user.GetCapture() or 0
+        return api.call_proc(original, window, message, wparam, lparam)
+    original = api.set_long(hwnd, -4, C.cast(procedure, C.c_void_p).value)
+    if not original:
+        raise OSError(C.get_last_error(), "Synthetic target handler could not be installed")
     user.SendMessageW(checkbox, 0x00F1, 1, 0)
     root.update()
     user.SetFocus(edit)

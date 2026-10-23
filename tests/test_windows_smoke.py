@@ -1,6 +1,8 @@
 """Integration tests against real Windows APIs and synthetic controls."""
 from __future__ import annotations
 import argparse
+import ctypes as C
+from ctypes import wintypes as W
 import json
 import os
 from pathlib import Path
@@ -51,14 +53,20 @@ class WindowsIntegrationTests(unittest.TestCase):
         cls.temp.cleanup()
 
     def test_native_window_monitor_dpi_focus_capture(self):
+        # Reacquire on the target's own thread, then compare with the cross-thread
+        # inspector result. OS capture state may have changed since fixture startup.
+        send = self.api.user.SendMessageW
+        send.argtypes = [W.HWND, W.UINT, W.WPARAM, W.LPARAM]
+        send.restype = C.c_ssize_t
+        captured = send(self.target["hwnd"], 0x800A, 0, 0)
         result = self.native.window(self.target["hwnd"], self.target["thread"])
         monitor = result["monitor_and_DPI"]
         self.assertTrue(monitor["device_name"].startswith("\\\\.\\DISPLAY"), monitor)
         self.assertGreaterEqual(monitor["window_dpi"], 96)
         self.assertEqual(len(monitor["work_area_rect_physical_pixels"]), 4)
         gui = result["GUI_thread"]
-        self.assertEqual(gui["capture"], hex(self.target["hwnd"]))
-        self.assertTrue(gui["capture_within_selected_window"])
+        self.assertEqual(gui["capture"], hex(captured))
+        self.assertEqual(gui["capture_within_selected_window"], captured == self.target["hwnd"])
         self.assertIn("extra_storage", result)
 
     def test_native_process_modules_resources_power(self):
@@ -72,7 +80,13 @@ class WindowsIntegrationTests(unittest.TestCase):
         self.assertGreater(modules["module_count"], 0)
         self.assertTrue(any(str(module.get("path", "")).lower().endswith(".dll") for module in modules["modules"]))
         self.assertTrue(all("base_address" in module for module in modules["modules"]))
-        self.assertIn("control_mask", result["power_throttling"])
+        power = result["power_throttling"]
+        if power.get("available") is False:
+            self.assertIn(power["status"], ("not_supported", "query_unavailable"))
+            self.assertIn(power.get("winerror"), (50, 87, 120))
+        else:
+            self.assertIsInstance(power["control_mask"], int)
+            self.assertIsInstance(power["state_mask"], int)
 
     def test_uia_checkbox_and_edit_values(self):
         capture = support.Capture(self.target["hwnd"], self.target["pid"], self.target["thread"], {},

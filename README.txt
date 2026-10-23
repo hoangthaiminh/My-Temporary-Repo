@@ -158,7 +158,7 @@ desktops are outside the supported inspection surface.
 
 Validation
 ----------
-The included suite has 63 logic/package tests and four Windows-native integration
+The included suite has 64 logic/package tests and four Windows-native integration
 tests. Native tests start synthetic controls and verify monitor/DPI, GUI-thread
 capture, process modules/resources/power metadata, UIA checkbox/edit values, GUI
 startup and hook cleanup. Logic tests also cover provider timeout/cancellation,

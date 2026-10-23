@@ -34,7 +34,7 @@ def absent(reason, status="query_error", **extra):
 def failure(exc):
     hresult = getattr(exc, "hresult", None)
     code = hresult & 0xFFFFFFFF if isinstance(hresult, int) else None
-    status = {0x80070005: "access_denied", 0x80040200: "not_supported",
+    status = {0x80070005: "access_denied", 0x80040200: "query_unavailable", 0x80040204: "not_supported",
               0x80040201: "window_gone", 0x80131505: "timeout"}.get(code, "query_error")
     extra = {"HRESULT": f"0x{code:08X}"} if code is not None else {}
     return absent(f"{type(exc).__name__}: {exc}", status, **extra)
