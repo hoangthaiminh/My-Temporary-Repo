@@ -1,4 +1,4 @@
-# Screen App Inspect 2.0
+# Screen App Inspect 2.1
 
 A mouse-operated window inspector for Windows. All interface text, code comments,
 and included instructions are in English.
@@ -36,6 +36,14 @@ copies. Unavailable/unsupported fields include error records. There is no genera
 API for every application's private internal properties; the report covers the
 queries implemented by this tool.
 
+Version 2.1 distinguishes `not_applicable`, `not_supported`, `access_denied`,
+`query_unavailable` and unexpected `query_error` results. It skips unsupported
+psutil getters and inapplicable layered-window queries, recognizes normal missing
+MSIX/application identities, and checks OS-build requirements for recent DWM
+attributes. Reports retain raw error codes and add runtime/build details plus a
+field-status summary. An unavailable field does not automatically mean capture
+failed. See `CHANGELOG.txt` and `README.txt` in the ZIP.
+
 The click-through, non-activating overlay reasserts its topmost position periodically
 and responds to foreground and window-order events. Windows still reserves higher
 system/security bands, so an ordinary Python overlay cannot guarantee being above
@@ -46,5 +54,5 @@ Desktop/taskbar and Explorer windows are excluded by default. Use
 `--include-explorer` to inspect Explorer app windows too. System-hosted notifications
 may identify their rendering host rather than their sender.
 
-Python syntax and **29 mocked logic tests passed on Linux**. The actual native
+Python syntax and **46 mocked logic tests passed on Linux**. The actual native
 Windows integration and interactive GUI have not been run in this environment.
