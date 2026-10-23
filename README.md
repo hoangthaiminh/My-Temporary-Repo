@@ -1,4 +1,4 @@
-# Screen App Inspect 2.1
+# Screen App Inspect 2.2
 
 A mouse-operated window inspector for Windows. All interface text, code comments,
 and included instructions are in English.
@@ -12,8 +12,9 @@ py -m pip install -r requirements.txt
 py screen_app_inspect.py
 ```
 
-Requires Windows 10/11 and Python 3.10+ with Tcl/Tk. Keep `screen_app_inspect.py`
-and `inspect_support.py` together. You can also use `run.cmd` after installation.
+Requires Windows 10/11 and Python 3.10+ with Tcl/Tk. Keep all three Python modules
+together. `psutil` and Windows-only `comtypes` are installed by requirements.txt.
+You can also use `run.cmd` after installation.
 
 | Control | Action |
 | --- | --- |
@@ -31,6 +32,11 @@ The tooltip always contains basic identification only. Full reports are collecte
 in the background and include window/class/child-window properties, process
 arguments and environment, executable/version metadata, token/session details,
 CPU/memory/I/O information, threads, files, and network connections where readable.
+Version 2.2 adds monitor/work-area/DPI metadata, decoded DWM preferences, DLL module
+addresses and versions, GDI/USER counts, configured power-throttling policy, extra
+window/class storage, and read-only UI Automation properties/text/value/toggle
+state. Focus/capture use the selected window's GUI thread, not the inspector's.
+See [CAPABILITIES.md](CAPABILITIES.md) for exact sources and limitations.
 Reports are not truncated. A frozen report is collected once and reused for later
 copies. Unavailable/unsupported fields include error records. There is no general
 API for every application's private internal properties; the report covers the
@@ -54,5 +60,18 @@ Desktop/taskbar and Explorer windows are excluded by default. Use
 `--include-explorer` to inspect Explorer app windows too. System-hosted notifications
 may identify their rendering host rather than their sender.
 
-Python syntax and **46 mocked logic tests passed on Linux**. The actual native
-Windows integration and interactive GUI have not been run in this environment.
+UI Automation runs in an isolated, cancellable helper with a four-second budget.
+Use `--uia-timeout 10` for a slower provider or `--no-uia` to skip this section.
+The tooltip remains compact; copied/frozen JSON contains the collected details.
+
+The repository includes source, tests, a package builder and GitHub Actions checks
+for Python 3.10/3.13 on Ubuntu, Windows Server 2022 and Windows Server 2025.
+The suite contains 63 logic/package tests plus four Windows-native integration
+tests using synthetic controls (not user reports). See
+[verification runs](https://github.com/hoangthaiminh/My-Temporary-Repo/actions/workflows/verify-inspector.yml)
+for actual run status. Native tests cover Win32 metadata, UI Automation values,
+GUI startup and hook cleanup. They do not certify every third-party application,
+interactive mouse sequence, Windows edition, or privileged surface.
+
+Run `verify.cmd` on Windows, or `python -m unittest discover -s tests -v` from a
+terminal. Build the ZIP with `python tools/build_package.py`.

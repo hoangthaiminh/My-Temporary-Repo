@@ -1,0 +1,52 @@
+SCREEN APP INSPECT 2.2
+
+Added in 2.2
+------------
+- Monitor/device names, physical work area, DPI/scaling and DPI-awareness metadata.
+- UI Automation Control Type/Automation ID/Name/Value/Toggle/document-text data for
+  the selected window, saved pointer element and focused element inside it.
+  UIA runs in a timed, cancellable helper; no setter/invoke/toggle actions are used.
+- Loaded loader modules with addresses, sizes, entry points, paths and versions.
+- GDI/USER current/peak counts and configured power-throttling/EcoQoS policy masks.
+- Raw window/class extra-storage DWORDs and decoded DWM corner/backdrop names.
+- Explicit focus/capture scope through the target GUI thread/input queue.
+- Full source/tests, verification script, reproducible package builder and CI matrix.
+- Synthetic Windows-native tests for APIs, accessibility, GUI startup and hooks.
+
+Version 2.1 fixes retained
+-------------------------
+
+Fixes
+-----
+- Check whether the installed psutil Process API implements a getter before
+  invoking it. Windows-only reports no longer produce a misleading AttributeError
+  for Unix-only Process.terminal.
+- Missing APIs are not_supported. Exceptions raised inside an implemented getter
+  remain visible as query_error/access_denied/etc. They are not disguised as
+  unsupported APIs.
+- Decode APPMODEL_ERROR_NO_PACKAGE (15700) and APPMODEL_ERROR_NO_APPLICATION
+  (15703) as not_applicable, retaining their exact codes and symbolic names.
+  Real identity-query failures such as access denied remain failures.
+- Check WS_EX_LAYERED before calling GetLayeredWindowAttributes. A non-layered
+  window's constant-alpha/color-key fields are not_applicable. This classification
+  does not claim the compositor surface is fully opaque.
+- Preserve ambiguity when a layered window returns ERROR_INVALID_PARAMETER (87).
+  Per-pixel layering is a possible cause, not a confirmed diagnosis.
+- Check minimum Windows builds for documented recent DWM attributes. Unsupported
+  builds are recorded explicitly. E_INVALIDARG from supported/unknown builds is
+  retained as query_unavailable rather than attributed to a guessed cause.
+- Add Windows/runtime version information and a summary of structured unavailable
+  fields. Original Win32/HRESULT codes remain available for diagnostics.
+- A zero GetPriorityClass result is now recorded as a query failure rather than
+  a valid priority class.
+
+Unchanged behavior
+------------------
+Compact-only tooltip, left-click freeze/resume, right-click full copy, immutable
+frozen reports, pause/normal mouse mode, and topmost reassertion are retained.
+
+Validation
+----------
+The suite includes 63 logic/package tests and four native Windows tests. Consult
+GitHub Actions for platform-specific results. Tests use synthetic fixture data;
+no user's exported report or process environment is distributed with this package.
